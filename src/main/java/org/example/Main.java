@@ -1,41 +1,59 @@
 package org.example;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
+import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 import java.io.IOException;
 import java.io.File;
+import java.util.Scanner;
 
-public class Main extends PDFTextStripper{
+public class Main {
 
-    private static String password;
+    private static String dob;
+
     public Main() throws IOException {
     }
 
-    public static void main( String[] args ) throws IOException {
-        password=args[0];
 
-        if(password.equals("qwerty")) {
-            File file = new File("src/main/resources/pdfDocument.pdf");
-            PDDocument document = PDDocument.load(file);
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            pdfStripper.setStartPage(1);
-            pdfStripper.setEndPage(document.getNumberOfPages());
+    public static void main(String[] args) throws IOException {
+//        dob = args[0];
+        Scanner sc=new Scanner(System.in);
 
-            //load all lines into a string
-            String pages = pdfStripper.getText(document);
+        try{
+                PDDocument document = null;
+                document = PDDocument.load(new File("C:\\Users\\Ditsdev154\\Downloads\\dateFile3.pdf"));
+                document.getClass();
+                if (!document.isEncrypted()) {
+                    PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+                    stripper.setSortByPosition(true);
+                    PDFTextStripper pdfStripper = new PDFTextStripper();
+                    String data = pdfStripper.getText(document);
+                    String[] lines = data.split("\r\n|\r|\n");
 
-            //split by detecting newline
-            String[] lines = pages.split("\r\n|\r|\n");
+                    AccessPermission ap = new AccessPermission();
 
-            int count = 1;   //Just to indicate line number
-            for (String temp : lines) {
-                System.out.println(count + " " + temp);
-                count++;
+                    for (String temp : lines) {
+                            if (dob.equals(temp.trim())){
+                                StandardProtectionPolicy stpp = new StandardProtectionPolicy(temp, dob, ap);
+
+                                stpp.setEncryptionKeyLength(128);
+
+                                stpp.setPermissions(ap);
+
+                                document.protect(stpp);
+                                System.out.println(temp);
+                        }
+                }
+                    document.save("C:\\Users\\Ditsdev154\\Downloads\\dateFile3.pdf");
+                    document.close();
+
+                    System.out.println("PDF Encrypted successfully...");
             }
-        }
-        else {
-            throw new IOException("password incorrect");
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 }
