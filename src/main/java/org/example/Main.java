@@ -1,59 +1,49 @@
 package org.example;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.encryption.AccessPermission;
-import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
-import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
-
-import java.io.IOException;
+import java.awt.*;
 import java.io.File;
-import java.util.Scanner;
+import java.io.IOException;
 
 public class Main {
 
-    private static String dob;
-
-    public Main() throws IOException {
-    }
-
-
-    public static void main(String[] args) throws IOException {
-//        dob = args[0];
-        Scanner sc=new Scanner(System.in);
-
-        try{
-                PDDocument document = null;
-                document = PDDocument.load(new File("C:\\Users\\Ditsdev154\\Downloads\\dateFile3.pdf"));
-                document.getClass();
-                if (!document.isEncrypted()) {
-                    PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-                    stripper.setSortByPosition(true);
-                    PDFTextStripper pdfStripper = new PDFTextStripper();
-                    String data = pdfStripper.getText(document);
-                    String[] lines = data.split("\r\n|\r|\n");
-
-                    AccessPermission ap = new AccessPermission();
-
-                    for (String temp : lines) {
-                            if (dob.equals(temp.trim())){
-                                StandardProtectionPolicy stpp = new StandardProtectionPolicy(temp, dob, ap);
-
-                                stpp.setEncryptionKeyLength(128);
-
-                                stpp.setPermissions(ap);
-
-                                document.protect(stpp);
-                                System.out.println(temp);
-                        }
+    public static void main(String[] args) {
+        try {
+            String password = "16061998";
+            File encryptedFile = new File("C:\\Users\\Ditsdev154\\Downloads\\TestDoc-protected.pdf");
+            File decryptedFile = new File("C:\\Users\\Ditsdev154\\Downloads\\TestDoc-decrypted.pdf");
+            boolean passwordFound = false;
+            PDDocument document = new PDDocument();
+            //Start Loop
+            for(;;) {
+                try {
+                    document = PDDocument.load(encryptedFile, password);
+                    passwordFound = true;
+                } catch (Exception ex) {
+                    ex.getMessage();
                 }
-                    document.save("C:\\Users\\Ditsdev154\\Downloads\\dateFile3.pdf");
-                    document.close();
-
-                    System.out.println("PDF Encrypted successfully...");
+                if (passwordFound) {
+                    //Print Correct Password
+                    break;
+                }
             }
-        }catch(Exception e){
+            //EndLoop
+
+            // Remove the security to allow saving the decrypted version
+            document.setAllSecurityToBeRemoved(true);
+
+            // Save the decrypted document to a new file
+            document.save(decryptedFile);
+
+            // Close the document
+            document.close();
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(new File("C:\\Users\\Ditsdev154\\Downloads\\TestDoc-decrypted.pdf"));
+
+            System.out.println("Decryption successful. Decrypted file saved to: " + decryptedFile.getAbsolutePath());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
