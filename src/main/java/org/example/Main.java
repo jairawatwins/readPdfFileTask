@@ -1,7 +1,6 @@
 package org.example;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-//import java.awt.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +11,7 @@ import java.util.List;
 
 public class Main {
 
-    public static java.util.List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
+    public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> dateRange = new ArrayList<>();
 
         LocalDate currentDate = startDate;
@@ -20,7 +19,6 @@ public class Main {
             dateRange.add(currentDate);
             currentDate = currentDate.plusDays(1);
         }
-
         return dateRange;
     }
 
@@ -52,7 +50,7 @@ public class Main {
             // Print the dateRange list
 
 //            //Start Loop
-            for(LocalDate date : dateRange) {
+            for (LocalDate date : dateRange) {
                 String convertedDate = convertDateFormat(String.valueOf(date), outputFormat);
                 try {
                     document = PDDocument.load(encryptedFile, convertedDate);
@@ -67,8 +65,6 @@ public class Main {
                     System.out.println(convertedDate);
                     break;
                 }
-
-
             }
             //EndLoop
 
@@ -88,6 +84,4 @@ public class Main {
             e.printStackTrace();
         }
     }
-
-
 }
